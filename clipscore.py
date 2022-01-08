@@ -202,6 +202,11 @@ def get_refonlyclipscore(model, references, candidates, device):
 
     return np.mean(per), per
 
+def float_convert(obj):
+    try:
+        return float(obj)
+    except:
+        return 0
 
 def main():
     args = parse_args()
@@ -273,7 +278,7 @@ def main():
 
             for k, v in other_metrics_per_cap.items():
                 if k != 'bleu':
-                    other_metrics_per_cap[k] = [i['All']['f'] for i in v]
+                    other_metrics_per_cap[k] = [float_convert(i['All']['f']) for i in v]
 
             df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap)
             df_all_metrics.to_csv( output_name, header=None, index=None, sep=' ', mode='a')
