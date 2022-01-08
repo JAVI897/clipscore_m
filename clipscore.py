@@ -215,7 +215,8 @@ def main():
                    if path.endswith(('.png', '.jpg', '.jpeg', '.tiff'))]
     image_ids = [pathlib.Path(path).stem for path in image_paths]
 
-    output_name = 'scores_all_caps_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
+    output_name_all_caps = 'scores_all_caps_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
+    output_name_scores = 'scores_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
     print('Writing outputs to: {}'.format(output_name))
 
     with open(args.candidates_json) as f:
@@ -276,13 +277,16 @@ def main():
             other_metrics_per_cap['BLEU-4'] = other_metrics_per_cap['bleu'][3]
             del other_metrics_per_cap['bleu']
 
-            for k, v in other_metrics_per_cap.items():
-                if k != 'bleu':
-                    other_metrics_per_cap[k] = [float_convert(i['All']['f']) for i in v]
+            other_metrics_per_cap['spice'] = [float_convert(i['All']['f']) for i in other_metrics_per_cap['spice']]
 
-            df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap)
+            other_metrics_per_cap['CLIPScore'] = [s['CLIPScore'] for s in scores.values()]
+            other_metrics_per_cap['RefCLIPScore'] = [s['RefCLIPScore'] for s in scores.values()]
+
+            df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap, columns = ['METEOR', 'ROUGE', 'CIDER', 'SPICE', 'BLEU-1', 'BLEU-2', 'BLEU-3', 'BLEU-4',
+                                                                                      'CLIPScore', 'RefCLIPScore'])
             df_all_metrics.to_csv( output_name, header=None, index=None, sep=' ', mode='a')
 
+            print(df_all_metrics.mean())
         print('CLIPScore: {:.4f}'.format(np.mean([s['CLIPScore'] for s in scores.values()])))
         print('RefCLIPScore: {:.4f}'.format(np.mean([s['RefCLIPScore'] for s in scores.values()])))
 
