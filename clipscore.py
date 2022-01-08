@@ -264,12 +264,17 @@ def main():
     if args.references_json:
         if args.compute_other_ref_metrics:
             other_metrics, other_metrics_per_cap = generation_eval_utils.get_all_metrics(references, candidates)
+            scores_metrics = {}
             for k, v in other_metrics.items():
                 if k == 'bleu':
                     for bidx, sc in enumerate(v):
                         print('BLEU-{}: {:.4f}'.format(bidx+1, sc))
+                        scores_metrics['BLEU-{}'.format(bidx+1)] = sc
                 else:
                     print('{}: {:.4f}'.format(k.upper(), v))
+                    scores_metrics[k.upper()] = v
+            scores_metrics['CLIPScore'] = np.mean([s['CLIPScore'] for s in scores.values()])
+            scores_metrics['RefCLIPScore'] = np.mean([s['RefCLIPScore'] for s in scores.values()])
 
             other_metrics_per_cap['BLEU-1'] = other_metrics_per_cap['bleu'][0]
             other_metrics_per_cap['BLEU-2'] = other_metrics_per_cap['bleu'][1]
@@ -285,8 +290,9 @@ def main():
             df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap) #columns = ['METEOR', 'ROUGE', 'CIDER', 'SPICE', 'BLEU-1', 'BLEU-2', 'BLEU-3', 'BLEU-4',
                                                                            #           'CLIPScore', 'RefCLIPScore']
             df_all_metrics.to_csv( output_name_all_caps, header=None, index=None, sep=' ', mode='a')
-
-            print(df_all_metrics.mean())
+            df_scores = pd.DataFrame.from_dict(scores_metrics)
+            df_scores.to_csv( output_name_scores, index=None, sep=' ', mode='a')
+            
         print('CLIPScore: {:.4f}'.format(np.mean([s['CLIPScore'] for s in scores.values()])))
         print('RefCLIPScore: {:.4f}'.format(np.mean([s['RefCLIPScore'] for s in scores.values()])))
 
