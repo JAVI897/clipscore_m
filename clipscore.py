@@ -217,7 +217,7 @@ def main():
 
     output_name_all_caps = 'scores_all_caps_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
     output_name_scores = 'scores_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
-    print('Writing outputs to: {}'.format(output_name))
+    print('Writing outputs to: {}'.format(output_name_all_caps))
 
     with open(args.candidates_json) as f:
         candidates = json.load(f)
