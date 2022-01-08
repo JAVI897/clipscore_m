@@ -290,7 +290,7 @@ def main():
             df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap) #columns = ['METEOR', 'ROUGE', 'CIDER', 'SPICE', 'BLEU-1', 'BLEU-2', 'BLEU-3', 'BLEU-4',
                                                                            #           'CLIPScore', 'RefCLIPScore']
             df_all_metrics.to_csv( output_name_all_caps, header=None, index=None, sep=' ', mode='a')
-            df_scores = pd.DataFrame.from_dict(scores_metrics)
+            df_scores = pd.DataFrame.from_dict(scores_metrics).round(4)
             df_scores.to_csv( output_name_scores, index=None, sep=' ', mode='a')
             
         print('CLIPScore: {:.4f}'.format(np.mean([s['CLIPScore'] for s in scores.values()])))
