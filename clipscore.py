@@ -269,12 +269,12 @@ def main():
                 if k == 'bleu':
                     for bidx, sc in enumerate(v):
                         print('BLEU-{}: {:.4f}'.format(bidx+1, sc))
-                        scores_metrics['BLEU-{}'.format(bidx+1)] = sc
+                        scores_metrics['BLEU-{}'.format(bidx+1)] = [sc]
                 else:
                     print('{}: {:.4f}'.format(k.upper(), v))
-                    scores_metrics[k.upper()] = v
-            scores_metrics['CLIPScore'] = np.mean([s['CLIPScore'] for s in scores.values()])
-            scores_metrics['RefCLIPScore'] = np.mean([s['RefCLIPScore'] for s in scores.values()])
+                    scores_metrics[k.upper()] = [v]
+            scores_metrics['CLIPScore'] = [np.mean([s['CLIPScore'] for s in scores.values()])]
+            scores_metrics['RefCLIPScore'] = [np.mean([s['RefCLIPScore'] for s in scores.values()])]
 
             other_metrics_per_cap['BLEU-1'] = other_metrics_per_cap['bleu'][0]
             other_metrics_per_cap['BLEU-2'] = other_metrics_per_cap['bleu'][1]
