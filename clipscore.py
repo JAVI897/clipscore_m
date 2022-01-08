@@ -265,6 +265,16 @@ def main():
                 else:
                     print('{}: {:.4f}'.format(k.upper(), v))
 
+            other_metrics_per_cap['BLEU-1'] = other_metrics_per_cap['bleu'][0]
+            other_metrics_per_cap['BLEU-2'] = other_metrics_per_cap['bleu'][1]
+            other_metrics_per_cap['BLEU-3'] = other_metrics_per_cap['bleu'][2]
+            other_metrics_per_cap['BLEU-4'] = other_metrics_per_cap['bleu'][3]
+            del other_metrics_per_cap['bleu']
+
+            for k, v in other_metrics_per_cap.items():
+                if k != 'bleu':
+                    other_metrics_per_cap[k] = [i['All']['f'] for i in v]
+
             df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap)
             df_all_metrics.to_csv( output_name, header=None, index=None, sep=' ', mode='a')
 
