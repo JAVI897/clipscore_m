@@ -14,8 +14,9 @@ from pycocoevalcap.rouge.rouge import Rouge
 from pycocoevalcap.spice.spice import Spice
 
 
-def get_all_metrics(refs, cands, return_per_cap=False):
+def get_all_metrics(refs, cands):
     metrics = []
+    metrics_per_cap = []
     names = []
 
     pycoco_eval_cap_scorers = [(Bleu(4), 'bleu'),
@@ -26,14 +27,13 @@ def get_all_metrics(refs, cands, return_per_cap=False):
 
     for scorer, name in pycoco_eval_cap_scorers:
         overall, per_cap = pycoco_eval(scorer, refs, cands)
-        if return_per_cap:
-            metrics.append(per_cap)
-        else:
-            metrics.append(overall)
+        metrics_per_cap.append(per_cap)
+        metrics.append(overall)
         names.append(name)
 
     metrics = dict(zip(names, metrics))
-    return metrics
+    metrics_per_cap = dict(zip(names, metrics_per_cap))
+    return metrics, metrics_per_cap
 
 
 def tokenize(refs, cands, no_op=False):

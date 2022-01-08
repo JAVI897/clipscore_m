@@ -25,7 +25,7 @@ import generation_eval_utils
 import pprint
 import warnings
 from packaging import version
-
+import pandas as pd
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -210,6 +210,9 @@ def main():
                    if path.endswith(('.png', '.jpg', '.jpeg', '.tiff'))]
     image_ids = [pathlib.Path(path).stem for path in image_paths]
 
+    output_name = 'scores_all_caps_' + args.candidates_json.split('/')[-1].replace('json', 'txt')
+    print('Writing outputs to: {}'.format(output_name))
+
     with open(args.candidates_json) as f:
         candidates = json.load(f)
     candidates = [candidates[cid] for cid in image_ids]
@@ -254,13 +257,17 @@ def main():
 
     if args.references_json:
         if args.compute_other_ref_metrics:
-            other_metrics = generation_eval_utils.get_all_metrics(references, candidates)
+            other_metrics, other_metrics_per_cap = generation_eval_utils.get_all_metrics(references, candidates)
             for k, v in other_metrics.items():
                 if k == 'bleu':
                     for bidx, sc in enumerate(v):
                         print('BLEU-{}: {:.4f}'.format(bidx+1, sc))
                 else:
                     print('{}: {:.4f}'.format(k.upper(), v))
+
+            df_all_metrics = pd.DataFrame.from_dict(other_metrics_per_cap)
+            df_all_metrics.to_csv( output_name, header=None, index=None, sep=' ', mode='a')
+
         print('CLIPScore: {:.4f}'.format(np.mean([s['CLIPScore'] for s in scores.values()])))
         print('RefCLIPScore: {:.4f}'.format(np.mean([s['RefCLIPScore'] for s in scores.values()])))
 
